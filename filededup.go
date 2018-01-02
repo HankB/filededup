@@ -6,7 +6,21 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"crypto/md5"
 )
+
+func getHash(filename string)  [md5.Size]byte {
+	h := md5.New()
+	if _, err := io.Copy(h, file); err != nil {
+		log.Fatal(err)
+	}
+	return h.Sum(nil)
+}
+
+func getLengthMatches(filename string) sql.Rows {
+	
+}
+
 
 var dbName = "filelist.db"
 var db	*sql.DB
@@ -51,7 +65,8 @@ func main() {
 	create table files (
 		length integer not null,
 		filename text not null,
-		hash blob );
+		hash blob,
+		links integer);
 	`
 	// create the table
 	_, err = db.Exec(sqlCreateStmt)
