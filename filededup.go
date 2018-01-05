@@ -1,34 +1,42 @@
 package main
 
 import (
+	"crypto/md5"
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
-	"crypto/md5"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-func getHash(filename string)  [md5.Size]byte {
+func getHash(filename string) []byte {
+	f, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
 	h := md5.New()
-	if _, err := io.Copy(h, file); err != nil {
+	if _, err := io.Copy(h, f); err != nil {
 		log.Fatal(err)
 	}
 	return h.Sum(nil)
 }
 
+/*
 func getLengthMatches(filename string) sql.Rows {
-	
-}
 
+}
+*/
 
 var dbName = "filelist.db"
-var db	*sql.DB
+var db *sql.DB
 var err error
 
 // callback from Walk()
 func myWalkFunc(path string, info os.FileInfo, err error) error {
-	if info.Mode() & os.ModeType != 0 {	// not a regular file?
+	if info.Mode()&os.ModeType != 0 { // not a regular file?
 		print("other: ", path, "\n")
 	} else {
 		print("len: ", info.Size(), " ", path, "\n")
@@ -50,9 +58,8 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-
 func main() {
-	os.Remove(dbName)		// remove pevious copy
+	os.Remove(dbName) // remove pevious copy
 
 	// open the database
 	db, err = sql.Open("sqlite3", dbName)
@@ -75,8 +82,6 @@ func main() {
 		return
 	}
 
-	filepath.Walk("./", myWalkFunc)
-
-
+	filepath.Walk("./sample-files", myWalkFunc)
 
 }
