@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/md5"
 	"database/sql"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -37,19 +38,21 @@ var err error
 // callback from Walk()
 func myWalkFunc(path string, info os.FileInfo, err error) error {
 	if info.Mode()&os.ModeType != 0 { // not a regular file?
-		print("other: ", path, "\n")
+		fmt.Printf("other: %s\n", path)
 	} else {
-		print("len: ", info.Size(), " ", path, "\n")
+		hash := getHash(path)
+		fmt.Printf("len: %d name: %s hash %x\n", info.Size(), path, hash)
 		tx, err := db.Begin()
 		if err != nil {
 			log.Fatal(err)
 		}
-		stmt, err := tx.Prepare("insert into files(length, filename) values(?, ?)")
+
+		stmt, err := tx.Prepare("insert into files(length, filename, hash) values(?, ?, ?)")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer stmt.Close()
-		_, err = stmt.Exec(info.Size(), path)
+		_, err = stmt.Exec(info.Size(), path, hash)
 		if err != nil {
 			log.Fatal(err)
 		}
