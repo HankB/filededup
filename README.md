@@ -10,6 +10,10 @@ are determined to be dupolicates by checking in order
 2. MD5 hash
 3. byte by byte comparison
 
+## Requirements
+
+* `go get github.com/mattn/go-sqlite3`
+
 ## Database
 * length int - required
 * filename text - required
