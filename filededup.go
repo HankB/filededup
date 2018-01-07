@@ -25,15 +25,37 @@ func getHash(filename string) []byte {
 	return h.Sum(nil)
 }
 
-/*
-func getLengthMatches(filename string) sql.Rows {
-
-}
-*/
-
 var dbName = "filelist.db"
 var db *sql.DB
 var err error
+
+func findMatch(filepath string, length int) (bool, string) {
+	rows, err := db.Query(`SELECT length, filename, hash linkCount
+							FROM files
+							WHERE length=?`,
+		length)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	more := rows.Next()
+	if more { // did we get any results?
+		hashCandidate = getHash(filepath) // need hash 
+		for rows.Next() {
+			var possiblMatch string
+			if err := rows.Scan(&possiblMatch); err != nil {
+				log.Fatal(err)
+			}
+			fmt.Printf("%s is %d\n", possiblMatch, length)
+		}
+	} else {
+		// no same length files
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return false, ""
+}
 
 // callback from Walk()
 func myWalkFunc(path string, info os.FileInfo, err error) error {
@@ -75,8 +97,8 @@ func main() {
 	create table files (
 		length integer not null,
 		filename text not null,
-		hash blob,
-		links integer);
+		hash blob defult null,
+		linkCount integer default 1);
 	`
 	// create the table
 	_, err = db.Exec(sqlCreateStmt)
