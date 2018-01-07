@@ -18,7 +18,7 @@ are determined to be dupolicates by checking in order
 * length int - required
 * filename text - required
 * hash blob - not required, calculated when needed.
-* link count - default to 1 and incremented for each hard link
+* linkCount - default to 1 and incremented for each hard link
 ## Strategy
 Iterate through all files and for each candidate:
 1. Query the database for files with matching length. If none match,
