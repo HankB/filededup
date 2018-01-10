@@ -8,10 +8,12 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"bytes"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
+/* Calculate the hash for the given file
+*/
 func getHash(filename string) []byte {
 	f, err := os.Open(filename)
 	if err != nil {
@@ -28,8 +30,41 @@ func getHash(filename string) []byte {
 var dbName = "filelist.db"
 var db *sql.DB
 var err error
+/* Insert the file into the database
+*/
+func insertFile(filePath string, length int64, hash []byte) {
+	_, err = db.Exec(`insert into files (length, filename, hash) 
+				values(?, ?, ?)`, length, filePath, hash)
+	if err != nil {
+		log.Fatal(err);
+	} 
+}
 
-func findMatch(filepath string, length int) (bool, string) {
+/* Update the hash for a file already in the database
+*/
+func updateHash(filePath string, hash []byte) {
+	result, err := db.Exec(`update files set hash = ? where filename = ?`,
+			hash, filePath)
+	if err != nil {
+		log.Fatal(err);
+	} else {
+		rowCount, err := result.RowsAffected()
+		if err != nil {
+			log.Fatal(err);
+		} else {
+			if rowCount != 1 {
+				log.Fatal("hash update affected %d", rowCount);
+			}
+		}
+	}
+}
+
+/* Check to see if a file matches (identical contents) to something
+   in the database. Update the hash for any files in the database that 
+   need to be checked and do not already have the hash calculated.
+*/
+func findMatch(filepath string, length int64) (bool, string, []byte) {
+	// search the database for files with matching length
 	rows, err := db.Query(`SELECT length, filename, hash linkCount
 							FROM files
 							WHERE length=?`,
@@ -38,23 +73,36 @@ func findMatch(filepath string, length int) (bool, string) {
 		log.Fatal(err)
 	}
 	defer rows.Close()
+
+	// check to see if any were found
 	more := rows.Next()
-	if more { // did we get any results?
-		hashCandidate = getHash(filepath) // need hash 
+	if more { 
+		// found similar files - need to calculate the hash of the candidate
+		hashCandidate := getHash(filepath) // need hash 
 		for rows.Next() {
-			var possiblMatch string
-			if err := rows.Scan(&possiblMatch); err != nil {
+			var possMatchLen int64	// do we really need this?
+			var possMatchFilename string
+			var possMatchHash []byte
+			if err := rows.Scan(&possMatchLen, &possMatchFilename, &possMatchHash); err != nil {
 				log.Fatal(err)
 			}
-			fmt.Printf("%s is %d\n", possiblMatch, length)
+			fmt.Printf("possible: %s is %d\n", possMatchFilename, length)
+			if possMatchHash == nil { //need hash for the possible match?
+				possMatchHash = getHash(possMatchFilename)
+				updateHash(possMatchFilename, possMatchHash)
+			}
+			if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
+				// TODO perform byte by byte check.
+				return true, possMatchFilename, possMatchHash
+			}
 		}
 	} else {
-		// no same length files
+		return false, "", nil	// no same length files
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return false, ""
+	return false, "", nil
 }
 
 // callback from Walk()
@@ -62,6 +110,7 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 	if info.Mode()&os.ModeType != 0 { // not a regular file?
 		fmt.Printf("other: %s\n", path)
 	} else {
+		/*
 		hash := getHash(path)
 		fmt.Printf("len: %d name: %s hash %x\n", info.Size(), path, hash)
 		tx, err := db.Begin()
@@ -79,6 +128,13 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 			log.Fatal(err)
 		}
 		tx.Commit()
+		*/
+		fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
+		found, matchPath, hash := findMatch(path, info.Size())
+		fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
+		if !found {
+			insertFile(path, info.Size(), hash)
+		}
 	}
 	return nil
 }
