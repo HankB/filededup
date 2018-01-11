@@ -30,6 +30,8 @@ func getHash(filename string) []byte {
 var dbName = "filelist.db"
 var db *sql.DB
 var err error
+var hashes map[string][]byte 
+
 /* Insert the file into the database
 */
 func insertFile(filePath string, length int64, hash []byte) {
@@ -43,6 +45,7 @@ func insertFile(filePath string, length int64, hash []byte) {
 /* Update the hash for a file already in the database
 */
 func updateHash(filePath string, hash []byte) {
+	fmt.Printf("updating hash %s %x\n", filePath, hash)
 	result, err := db.Exec(`update files set hash = ? where filename = ?`,
 			hash, filePath)
 	if err != nil {
@@ -65,6 +68,7 @@ func updateHash(filePath string, hash []byte) {
 */
 func findMatch(filepath string, length int64) (bool, string, []byte) {
 	// search the database for files with matching length
+	fmt.Printf("matching %s len %d\n", filepath, length)
 	rows, err := db.Query(`SELECT length, filename, hash linkCount
 							FROM files
 							WHERE length=?`,
@@ -76,10 +80,11 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 
 	// check to see if any were found
 	more := rows.Next()
+	var hashCandidate  []byte = nil
 	if more { 
 		// found similar files - need to calculate the hash of the candidate
-		hashCandidate := getHash(filepath) // need hash 
-		for rows.Next() {
+		hashCandidate = getHash(filepath) // need hash 
+		for more {
 			var possMatchLen int64	// do we really need this?
 			var possMatchFilename string
 			var possMatchHash []byte
@@ -89,20 +94,22 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 			fmt.Printf("possible: %s is %d\n", possMatchFilename, length)
 			if possMatchHash == nil { //need hash for the possible match?
 				possMatchHash = getHash(possMatchFilename)
-				updateHash(possMatchFilename, possMatchHash)
+				//updateHash(possMatchFilename, possMatchHash)
 			}
 			if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
 				// TODO perform byte by byte check.
 				return true, possMatchFilename, possMatchHash
 			}
+			more = rows.Next()
 		}
 	} else {
+		fmt.Printf("no length matches\n")
 		return false, "", nil	// no same length files
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return false, "", nil
+	return false, "", hashCandidate
 }
 
 // callback from Walk()
@@ -132,7 +139,9 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 		fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
 		found, matchPath, hash := findMatch(path, info.Size())
 		fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
-		if !found {
+		if found {
+			// TODO link files
+		} else {
 			insertFile(path, info.Size(), hash)
 		}
 	}
