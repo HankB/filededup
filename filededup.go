@@ -12,6 +12,15 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+/* return largest of two arguments
+*/
+func min( a,b int64) int64 {
+	if a <= b {
+		return a
+	}
+	return b
+}
 /* Calculate the hash for the given file
 */
 func getHash(filename string) []byte {
@@ -62,6 +71,53 @@ func updateHash(filePath string, hash []byte) {
 	}
 }
 
+/* Compare two files byte by byte to see if they are identical.
+   Files are same length and have matching hashes.
+*/
+func compareByteByByte(f1, f2 string, len int64) bool {
+	const blocksize int64 = 4096
+	buf1 := make([]byte, blocksize)
+	buf2 := make([]byte, blocksize)
+
+	file1, err := os.Open(f1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file1.Close()
+
+	file2, err := os.Open(f2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file2.Close()
+
+	// read both a block at a time
+	var bytesRead int64
+	for bytesRead = 0; bytesRead < len; bytesRead += min(blocksize, len-bytesRead) {
+		read1, err := file1.Read(buf1[0:min(blocksize, len-bytesRead)])
+		if err != nil {
+			log.Fatal("bytes read:", read1, " ", err)
+		}
+		if int64(read1) < min(blocksize, len-bytesRead) {
+			log.Fatal("Expected ",  min(blocksize, len-bytesRead), " bytes got ",  read1)
+		}
+
+		read2, err := file2.Read(buf2[0:min(blocksize, len-bytesRead)])
+		if err != nil {
+			log.Fatal(err)
+		}
+		if int64(read2) < min(blocksize, len-bytesRead) {
+			log.Fatal("Expected ",  min(blocksize, len-bytesRead), " bytes got ",  read2)
+		}
+
+		fmt.Printf("comparing bytes read:%d, %d: %d\n", read1, read2, bytes.Compare(buf1[0:read1], buf2[0:read2]))
+		if bytes.Compare(buf1[0:read1], buf2[0:read2]) != 0 { // matching byes?
+			return false
+		}
+	}
+	return true
+}
+
 /* Check to see if a file matches (identical contents) to something
    in the database. Update the hash for any files in the database that 
    need to be checked and do not already have the hash calculated.
@@ -97,8 +153,9 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 				//updateHash(possMatchFilename, possMatchHash)
 			}
 			if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
-				// TODO perform byte by byte check.
-				return true, possMatchFilename, possMatchHash
+				if compareByteByByte(filepath, possMatchFilename, length) { // verify match
+					return true, possMatchFilename, possMatchHash
+				}
 			}
 			more = rows.Next()
 		}
