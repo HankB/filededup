@@ -16,6 +16,12 @@ set of test files
 * Hard linking not yet implemented.
 * Formal tests not yet implemented. (Tests manually performed against sample files)
 
+## Testing
+
+`go test` from the project root to run Go tests.
+`go run go run filededup.go` to run the main applidcation which is a sort of manual test.
+
+
 ## Issues
 * Need to address files already hard linked (short cut comparison.)
 * Need to address file permissions - cannot link a file we cannot delete.
