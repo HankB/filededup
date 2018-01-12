@@ -1,6 +1,6 @@
 # filededup
 
-File deduplication utility.
+File deduplication utility. (ssh://git@oak:10022/HankB/filededup.git)
 
 ## Summary
 Deduplicate files in a directory tree by hard linking identical files. Files
