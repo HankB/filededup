@@ -9,6 +9,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os/exec"
 	"testing"
 )
 
@@ -33,4 +35,17 @@ func ExampleGetHash() {
 	// Output:
 	// hash b2ed2fd7ff0dc6de08c32072e40aa6bc
 	// hash 2f240ab9499d7988e28288f41967a562
+}
+
+func ExampleInsertFile() {
+	initDataBase("sqlite3", "test.db")
+	insertFile("test file", 33, []byte("abcd"))
+	out, err := exec.Command("/usr/bin/sqlite3", "test.db", "select * from files").Output()
+	//out, err := exec.Command("/bin/ls", "test.db").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s\n", out)
+	closeDataBase()
+	// Output: 33|test file|abcd|1
 }
