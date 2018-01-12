@@ -5,18 +5,14 @@ Test code for various routines in filededup.go
 
 */
 
-
 package main
 
-import {
+import (
 	"testing"
-}
+)
 
-func TestMin(t *testing.T)
-{
-	if min(3,4) == 4 {
+func TestMin(t *testing.T) {
+	if min(3, 4) == 4 {
 		t.Fatal("min() returned wrong value")
 	}
- 
-
 }
