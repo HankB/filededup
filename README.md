@@ -4,11 +4,23 @@ File deduplication utility.
 
 ## Summary
 Deduplicate files in a directory tree by hard linking identical files. Files
-are determined to be dupolicates by checking in order
+are determined to be duplicates by checking in order
 
 1. file length
 2. MD5 hash
 3. byte by byte comparison
+
+## Status
+* Three tests (length, MD5 hash, byte by byte comparison) working for a small
+set of test files
+* Hard linking not yet implemented.
+* Formal tests not yet implemented. (Tests manually performed against sample files)
+
+## Issues
+* Need to address files already hard linked (short cut comparison.)
+* Need to address file permissions - cannot link a file we cannot delete.
+* Need to implement rename, link, delete and accommodate permissions.
+* Command line arguments - directory, verbosity, version.
 
 ## Requirements
 
