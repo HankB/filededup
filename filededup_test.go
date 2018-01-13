@@ -70,11 +70,25 @@ func TestCompareByteByByte(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	if !compareByteByByte("cmpfile.4096-1", "cmpfile.4096-2", 4096) {
+		t.Fatal("cmpfile.4096-1, cmpfile.4096-2 do not match")
+	}
+	if compareByteByByte("cmpfile.4096-1", "cmpfile.4096-3", 4096) {
+		t.Fatal("cmpfile.4096-1, cmpfile.4096-3 match")
+	}
+
 	if !compareByteByByte("cmpfile.1024-1", "cmpfile.1024-2", 1024) {
 		t.Fatal("cmpfile.1024-1, cmpfile.1024-2 do not match")
 	}
 	if compareByteByByte("cmpfile.1024-1", "cmpfile.1024-3", 1024) {
 		t.Fatal("cmpfile.1024-1, cmpfile.1024-3 match")
+	}
+
+	if !compareByteByByte("cmpfile.5120-1", "cmpfile.5120-2", 5120) {
+		t.Fatal("cmpfile.5120-1, cmpfile.5120-2 do not match")
+	}
+	if compareByteByByte("cmpfile.5120-1", "cmpfile.5120-3", 5120) {
+		t.Fatal("cmpfile.5120-1, cmpfile.5120-3 match")
 	}
 
 	if err = exec.Command("/bin/sh", "./rm_compare_files.sh").Run(); err != nil {
