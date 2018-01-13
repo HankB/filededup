@@ -39,13 +39,46 @@ func ExampleGetHash() {
 
 func ExampleInsertFile() {
 	initDataBase("sqlite3", "test.db")
+
 	insertFile("test file", 33, []byte("abcd"))
+	insertFile("test file 3", 333, nil)
 	out, err := exec.Command("/usr/bin/sqlite3", "test.db", "select * from files").Output()
-	//out, err := exec.Command("/bin/ls", "test.db").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s\n", out)
+	fmt.Printf("%s", out)
+
+	updateHash("test file", []byte("cba"))
+	updateHash("test file 3", []byte("xyz"))
+	out, err = exec.Command("/usr/bin/sqlite3", "test.db", "select * from files").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s", out)
+
 	closeDataBase()
-	// Output: 33|test file|abcd|1
+	// Output:
+	// 33|test file|abcd|1
+	// 333|test file 3||1
+	// 33|test file|cba|1
+	// 333|test file 3|xyz|1
+}
+
+func TestCompareByteByByte(t *testing.T) {
+
+	if err := exec.Command("/bin/sh", "./prep_compare_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	if !compareByteByByte("cmpfile.1024-1", "cmpfile.1024-2", 1024) {
+		t.Fatal("cmpfile.1024-1, cmpfile.1024-2 do not match")
+	}
+	if compareByteByByte("cmpfile.1024-1", "cmpfile.1024-3", 1024) {
+		t.Fatal("cmpfile.1024-1, cmpfile.1024-3 match")
+	}
+
+	if err = exec.Command("/bin/sh", "./rm_compare_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
 }
