@@ -55,7 +55,6 @@ func insertFile(filePath string, length int64, hash []byte) {
 /* Update the hash for a file already in the database
  */
 func updateHash(filePath string, hash []byte) {
-	fmt.Printf("updating hash %s %x\n", filePath, hash)
 	result, err := db.Exec(`update files set hash = ? where filename = ?`,
 		hash, filePath)
 	if err != nil {
@@ -111,7 +110,7 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 			log.Fatal("Expected ", min(blocksize, len-bytesRead), " bytes got ", read2)
 		}
 
-		fmt.Printf("comparing bytes read:%d, %d: %d\n", read1, read2, bytes.Compare(buf1[0:read1], buf2[0:read2]))
+		//fmt.Printf("comparing bytes read:%d, %d: %d\n", read1, read2, bytes.Compare(buf1[0:read1], buf2[0:read2]))
 		if bytes.Compare(buf1[0:read1], buf2[0:read2]) != 0 { // matching byes?
 			return false
 		}
