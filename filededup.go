@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	//"io/ioutil"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -136,7 +138,7 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 
 	// check to see if any were found
 	more := rows.Next()
-	var hashCandidate []byte = nil
+	var hashCandidate []byte
 	if more {
 		// found similar files - need to calculate the hash of the candidate
 		hashCandidate = getHash(filepath) // need hash
@@ -169,30 +171,29 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 	return false, "", hashCandidate
 }
 
+/* Link oldName to newName
+ */
+func replaceWithLink(oldName, newName string) {
+	for i := 0; i < 9; i++ {
+		tmpName := newName + strconv.Itoa(i)
+		fmt.Println(tmpName)
+		err := os.Link(oldName, tmpName)
+		if err != nil {
+			if !os.IsExist(err) {
+				log.Fatal(err)
+			}
+		} else {
+			// TODO: copy file atributes
+			return
+		}
+	}
+}
+
 // callback from Walk()
 func myWalkFunc(path string, info os.FileInfo, err error) error {
 	if info.Mode()&os.ModeType != 0 { // not a regular file?
 		fmt.Printf("other: %s\n", path)
 	} else {
-		/*
-			hash := getHash(path)
-			fmt.Printf("len: %d name: %s hash %x\n", info.Size(), path, hash)
-			tx, err := db.Begin()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			stmt, err := tx.Prepare("insert into files(length, filename, hash) values(?, ?, ?)")
-			if err != nil {
-				log.Fatal(err)
-			}
-			defer stmt.Close()
-			_, err = stmt.Exec(info.Size(), path, hash)
-			if err != nil {
-				log.Fatal(err)
-			}
-			tx.Commit()
-		*/
 		fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
 		found, matchPath, hash := findMatch(path, info.Size())
 		fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
