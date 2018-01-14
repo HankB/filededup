@@ -96,3 +96,7 @@ func TestCompareByteByByte(t *testing.T) {
 	}
 
 }
+
+func TestLinkFile(t *testing.T) {
+	replaceWithLink("a", "b")
+}
