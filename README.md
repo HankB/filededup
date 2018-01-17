@@ -13,13 +13,12 @@ are determined to be duplicates by checking in order
 
 ## Status
 
-* Three tests (length, MD5 hash, byte by byte comparison) working for a small set of test files
-* Hard linking not yet implemented.
-* Formal tests not yet implemented. (Tests manually performed against sample files)
+* Three comparisoins (length, MD5 hash, byte by byte comparison) working for a small set of test files
+* copy permissions and ownership to link not yet implemented.
 
 ## Testing
 
-* `go test` from the project root to run Go tests.
+* `go test` from the project root to run Go tests. (Or run individual tests from within VS code)
 * `go run filededup.go` to run the main application which is a sort of manual test.
 
 
