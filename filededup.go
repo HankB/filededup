@@ -67,7 +67,7 @@ func updateHash(filePath string, hash []byte) {
 			log.Fatal(err)
 		} else {
 			if rowCount != 1 {
-				log.Fatal("hash update affected %d", rowCount)
+				log.Fatalf("hash update affected %d\n", rowCount)
 			}
 		}
 	}
@@ -171,9 +171,11 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 	return false, "", hashCandidate
 }
 
-/* Link oldName to newName
+/* replace newName with link to oldName
  */
 func replaceWithLink(oldName, newName string) {
+	// first link to a temporary name. Linking
+	// with newName existing will fail
 	for i := 0; i < 9; i++ {
 		tmpName := newName + strconv.Itoa(i)
 		fmt.Println(tmpName)
@@ -184,6 +186,11 @@ func replaceWithLink(oldName, newName string) {
 			}
 		} else {
 			// TODO: copy file atributes
+			// rename temporary to newFile which will overwrite with the link
+			err = os.Rename(tmpName, newName)
+			if err != nil {
+				log.Fatal(err)
+			}
 			return
 		}
 	}
