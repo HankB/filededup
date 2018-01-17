@@ -10,7 +10,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
+	"syscall"
 	"testing"
 )
 
@@ -29,7 +31,7 @@ func TestMin(t *testing.T) {
 	}
 }
 
-func ExampleGetHash() {
+func Example_getHash() {
 	fmt.Printf("hash %x\n", getHash("sample-files/another file"))
 	fmt.Printf("hash %x\n", getHash("sample-files/yet another file"))
 	// Output:
@@ -37,7 +39,7 @@ func ExampleGetHash() {
 	// hash 2f240ab9499d7988e28288f41967a562
 }
 
-func ExampleInsertFile() {
+func Example_insertFile() {
 	initDataBase("sqlite3", "test.db")
 
 	insertFile("test file", 33, []byte("abcd"))
@@ -97,6 +99,43 @@ func TestCompareByteByByte(t *testing.T) {
 
 }
 
+func checkLink(foo, baz string) bool {
+	fooInfo, err := os.Stat(foo)
+	if err != nil {
+		log.Printf("can't Stat %s\n", foo)
+	}
+	bazInfo, err := os.Stat(baz)
+	if err != nil {
+		log.Printf("can't Stat %s\n", baz)
+	}
+
+	//fmt.Printf("fileinfo.Sys() = %#v\n", fileinfo.Sys())
+	//fmt.Printf("fileinfo = %#v\n", fileinfo)
+	fooStat, ok := fooInfo.Sys().(*syscall.Stat_t)
+	if !ok {
+		log.Printf("Not a syscall.Stat_t for %s\n", foo)
+		return false
+	}
+	bazStat, ok := bazInfo.Sys().(*syscall.Stat_t)
+	if !ok {
+		log.Printf("Not a syscall.Stat_t for %s\n", baz)
+		return false
+	}
+	return fooStat.Ino == bazStat.Ino
+}
 func TestLinkFile(t *testing.T) {
+
+	if err := exec.Command("/bin/sh", "./prep_link_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
 	replaceWithLink("a", "b")
+	if !checkLink("a", "b") {
+		t.Fatal("\"a\" \"b\" not linked\n")
+	}
+
+	if err := exec.Command("/bin/sh", "./rm_link_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
 }
