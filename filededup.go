@@ -124,47 +124,50 @@ func compareByteByByte(f1, f2 string, len int64) bool {
    in the database. Update the hash for any files in the database that
    need to be checked and do not already have the hash calculated.
 */
-func findMatch(filepath string, length int64) (bool, string, []byte) {
+func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 	// search the database for files with matching length
-	fmt.Printf("matching %s len %d\n", filepath, length)
+	fmt.Printf("matching %s len %d\n", filepath, info.Size())
 	rows, err := db.Query(`SELECT length, filename, hash linkCount
 							FROM files
 							WHERE length=?`,
-		length)
+		info.Size())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
 	// check to see if any were found
-	more := rows.Next()
 	var hashCandidate []byte
-	if more {
-		// found similar files - need to calculate the hash of the candidate
-		hashCandidate = getHash(filepath) // need hash
-		for more {
-			var possMatchLen int64 // do we really need this?
-			var possMatchFilename string
-			var possMatchHash []byte
-			if err := rows.Scan(&possMatchLen, &possMatchFilename, &possMatchHash); err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("possible: %s is %d\n", possMatchFilename, length)
+	for rows.Next() {
+		var possMatchLen int64 // do we really need this?
+		var possMatchFilename string
+		var possMatchHash []byte
+		if err := rows.Scan(&possMatchLen, &possMatchFilename, &possMatchHash); err != nil {
+			log.Fatal(err)
+		}
+
+		// check to see if the possMatchFilename and filepath are already linked
+		filepathInfo, err := os.Stat(possMatchFilename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if !os.SameFile(filepathInfo, info) {
+			fmt.Printf("possible: %s is %d\n", possMatchFilename, info.Size())
 			if possMatchHash == nil { //need hash for the possible match?
 				possMatchHash = getHash(possMatchFilename)
 				//updateHash(possMatchFilename, possMatchHash)
 			}
+			if hashCandidate == nil {
+				hashCandidate = getHash(filepath)
+			}
 			if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
-				if compareByteByByte(filepath, possMatchFilename, length) { // verify match
+				if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
 					return true, possMatchFilename, possMatchHash
 				}
 			}
-			more = rows.Next()
 		}
-	} else {
-		fmt.Printf("no length matches\n")
-		return false, "", nil // no same length files
 	}
+
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -176,9 +179,6 @@ func copyFileAtr(fromFile, toFile string) error {
 	return error(1)
 }
 */
-
-/* Check to see if the candidates are already linked
-
 
 /* replace newName with link to oldName
  */
@@ -211,7 +211,7 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 		fmt.Printf("other: %s\n", path)
 	} else {
 		fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
-		found, matchPath, hash := findMatch(path, info.Size())
+		found, matchPath, hash := findMatch(path, info)
 		fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
 		if found {
 			// TODO link files
