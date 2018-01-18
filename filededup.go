@@ -171,6 +171,15 @@ func findMatch(filepath string, length int64) (bool, string, []byte) {
 	return false, "", hashCandidate
 }
 
+/* Copy file attributes fro file to link
+func copyFileAtr(fromFile, toFile string) error {
+	return error(1)
+}
+*/
+
+/* Check to see if the candidates are already linked
+
+
 /* replace newName with link to oldName
  */
 func replaceWithLink(oldName, newName string) {
@@ -178,7 +187,6 @@ func replaceWithLink(oldName, newName string) {
 	// with newName existing will fail
 	for i := 0; i < 9; i++ {
 		tmpName := newName + strconv.Itoa(i)
-		fmt.Println(tmpName)
 		err := os.Link(oldName, tmpName)
 		if err != nil {
 			if !os.IsExist(err) {
@@ -194,6 +202,7 @@ func replaceWithLink(oldName, newName string) {
 			return
 		}
 	}
+	// TODO: provide appropriate action if we fall through for loop
 }
 
 // callback from Walk()
