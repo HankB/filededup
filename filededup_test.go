@@ -134,6 +134,11 @@ func TestLinkFile(t *testing.T) {
 		t.Fatal("\"a\" \"b\" not linked\n")
 	}
 
+	replaceWithLink("x", "y")
+	if !checkLink("x", "y") {
+		t.Fatal("\"x\" \"y\" not linked\n")
+	}
+
 	if err := exec.Command("/bin/sh", "./rm_link_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
