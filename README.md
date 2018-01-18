@@ -28,8 +28,9 @@ are determined to be duplicates by checking in order
 * Need to address file permissions - cannot link a file we cannot delete.
 * Need to implement rename, link, delete and accommodate permissions.
 * Command line arguments - directory, verbosity, version.
-* file permissions present a number of challenges. First, file/directory permissions may prevent replacing a fle with a link.
 * file attributes and ownership are required to be copied to the link from the file.
+* file permissions: file/directory permissions may prevent replacing a fle with a link. 
+* Changing file wonership requires root priveledge.
 * race conditions matching and then performing the link/replace operation.
 
 ## Requirements
