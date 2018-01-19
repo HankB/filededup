@@ -41,6 +41,7 @@ func Example_getHash() {
 
 func Example_insertFile() {
 	initDataBase("sqlite3", "test.db")
+	defer closeDataBase()
 
 	insertFile("test file", 33, []byte("abcd"))
 	insertFile("test file 3", 333, nil)
@@ -58,7 +59,6 @@ func Example_insertFile() {
 	}
 	fmt.Printf("%s", out)
 
-	closeDataBase()
 	// Output:
 	// 33|test file|abcd|1
 	// 333|test file 3||1
@@ -134,16 +134,50 @@ func TestLinkFile(t *testing.T) {
 		t.Fatal("\"a\" \"b\" not linked\n")
 	}
 
-	/* Test does not work, trying to rename already linked files
-	succeeds.
-	replaceWithLink("x", "y")
-	if !checkLink("x", "y") {
-		t.Fatal("\"x\" \"y\" not linked\n")
-	}
-	*/
-
 	if err := exec.Command("/bin/sh", "./rm_link_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
+}
+
+func Example_findMatch() {
+
+	if err := exec.Command("/bin/sh", "./prep_findmatch_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	initDataBase("sqlite3", "test.db")
+	defer closeDataBase()
+
+	fileNames := []string{"another file", "another file.copy", "empty", "empty-01",
+		"README.md", "thing one", "thing two", "yet another file", "x", "y"}
+
+	for _, fname := range fileNames {
+		//fmt.Println("sample-files/" + fname)
+		info, err := os.Stat("sample-files/" + fname)
+		if err != nil {
+			log.Fatal(err)
+		}
+		matched, matchName, hash := findMatch("sample-files/"+fname, info)
+		fmt.Printf("%s, %t, %s, %x .\n", fname, matched, matchName, hash)
+		if !matched {
+			insertFile("sample-files/"+fname, info.Size(), hash)
+		}
+
+	}
+	if err := exec.Command("/bin/sh", "./rm_findmatch_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	// Output:
+	// another file, false, ,  .
+	// another file.copy, true, sample-files/another file, b2ed2fd7ff0dc6de08c32072e40aa6bc .
+	// empty, false, ,  .
+	// empty-01, true, sample-files/empty, d41d8cd98f00b204e9800998ecf8427e .
+	// README.md, false, ,  .
+	// thing one, false, ,  .
+	// thing two, false, , 008ee33a9d58b51cfeb425b0959121c9 .
+	// yet another file, false, , 2f240ab9499d7988e28288f41967a562 .
+	// x, false, ,  .
+	// y, false, ,  .
 }
