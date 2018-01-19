@@ -135,8 +135,9 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 	}
 	defer rows.Close()
 
+	var hashCandidate []byte     // hash of file we're trying to match
+	var hashes map[string][]byte // hashes calculated for possible matches
 	// check to see if any were found
-	var hashCandidate []byte
 	for rows.Next() {
 		var possMatchLen int64 // do we really need this?
 		var possMatchFilename string
@@ -153,7 +154,11 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 		if !os.SameFile(filepathInfo, info) {
 			if possMatchHash == nil { //need hash for the possible match?
 				possMatchHash = getHash(possMatchFilename)
-				//updateHash(possMatchFilename, possMatchHash)
+				// save hashes to update after the present query is closed
+				if hashes == nil {
+					hashes = make(map[string][]byte)
+				}
+				hashes[possMatchFilename] = possMatchHash // update later
 			}
 			if hashCandidate == nil {
 				hashCandidate = getHash(filepath)
@@ -169,6 +174,15 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	rows.Close()
+
+	if hashes != nil {
+		for key, value := range hashes {
+			updateHash(key, value)
+		}
+	}
+
 	return false, "", hashCandidate
 }
 
