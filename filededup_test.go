@@ -39,31 +39,32 @@ func Example_getHash() {
 	// hash 2f240ab9499d7988e28288f41967a562
 }
 
+func dumpDatabase() {
+	out, err := exec.Command("/usr/bin/sqlite3", "test.db",
+		"select length, filename, HEX(hash), linkCount from files").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s", out)
+}
+
 func Example_insertFile() {
 	initDataBase("sqlite3", "test.db")
 	defer closeDataBase()
 
 	insertFile("test file", 33, []byte("abcd"))
 	insertFile("test file 3", 333, nil)
-	out, err := exec.Command("/usr/bin/sqlite3", "test.db", "select * from files").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s", out)
+	dumpDatabase()
 
 	updateHash("test file", []byte("cba"))
 	updateHash("test file 3", []byte("xyz"))
-	out, err = exec.Command("/usr/bin/sqlite3", "test.db", "select * from files").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s", out)
+	dumpDatabase()
 
 	// Output:
-	// 33|test file|abcd|1
+	// 33|test file|61626364|1
 	// 333|test file 3||1
-	// 33|test file|cba|1
-	// 333|test file 3|xyz|1
+	// 33|test file|636261|1
+	// 333|test file 3|78797A|1
 }
 
 func TestCompareByteByByte(t *testing.T) {
@@ -166,6 +167,7 @@ func Example_findMatch() {
 	if err := exec.Command("/bin/sh", "./rm_findmatch_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
+	dumpDatabase()
 
 	// Output:
 	// another file, false, ,  .
@@ -178,4 +180,12 @@ func Example_findMatch() {
 	// yet another file, false, , 2f240ab9499d7988e28288f41967a562 .
 	// x, false, ,  .
 	// y, false, ,  .
+	// 22|sample-files/another file|B2ED2FD7FF0DC6DE08C32072E40AA6BC|1
+	// 0|sample-files/empty||1
+	// 440|sample-files/README.md||1
+	// 64|sample-files/thing one|008EE33A9D58B51CFEB425B0959121C9|1
+	// 64|sample-files/thing two|008EE33A9D58B51CFEB425B0959121C9|1
+	// 22|sample-files/yet another file|2F240AB9499D7988E28288F41967A562|1
+	// 2|sample-files/x||1
+	// 2|sample-files/y||1
 }
