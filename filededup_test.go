@@ -109,8 +109,6 @@ func checkLink(foo, baz string) bool {
 		log.Printf("can't Stat %s\n", baz)
 	}
 
-	//fmt.Printf("fileinfo.Sys() = %#v\n", fileinfo.Sys())
-	//fmt.Printf("fileinfo = %#v\n", fileinfo)
 	fooStat, ok := fooInfo.Sys().(*syscall.Stat_t)
 	if !ok {
 		log.Printf("Not a syscall.Stat_t for %s\n", foo)
@@ -123,6 +121,7 @@ func checkLink(foo, baz string) bool {
 	}
 	return fooStat.Ino == bazStat.Ino
 }
+
 func TestLinkFile(t *testing.T) {
 
 	if err := exec.Command("/bin/sh", "./prep_link_files.sh").Run(); err != nil {
@@ -153,7 +152,6 @@ func Example_findMatch() {
 		"README.md", "thing one", "thing two", "yet another file", "x", "y"}
 
 	for _, fname := range fileNames {
-		//fmt.Println("sample-files/" + fname)
 		info, err := os.Stat("sample-files/" + fname)
 		if err != nil {
 			log.Fatal(err)
