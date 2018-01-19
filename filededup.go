@@ -126,7 +126,6 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 */
 func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 	// search the database for files with matching length
-	fmt.Printf("matching %s len %d\n", filepath, info.Size())
 	rows, err := db.Query(`SELECT length, filename, hash linkCount
 							FROM files
 							WHERE length=?`,
@@ -152,7 +151,6 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 			log.Fatal(err)
 		}
 		if !os.SameFile(filepathInfo, info) {
-			fmt.Printf("possible: %s is %d\n", possMatchFilename, info.Size())
 			if possMatchHash == nil { //need hash for the possible match?
 				possMatchHash = getHash(possMatchFilename)
 				//updateHash(possMatchFilename, possMatchHash)
