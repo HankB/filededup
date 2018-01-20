@@ -24,13 +24,10 @@ are determined to be duplicates by checking in order
 
 ## Issues/Challenges
 
-* Need to address files already hard linked (short cut comparison.)
-* Need to address file permissions - cannot link a file we cannot delete.
-* Need to implement rename, link, delete and accommodate permissions.
+* Need to address file permissions - cannot link a file we cannot delete. Note: Permissions and ownership match the file linked to.
 * Command line arguments - directory, verbosity, version.
-* file attributes and ownership are required to be copied to the link from the file.
 * file permissions: file/directory permissions may prevent replacing a fle with a link. 
-* Changing file wonership requires root priveledge.
+* Changing file ownership requires root priveledge.
 * race conditions matching and then performing the link/replace operation.
 
 ## Requirements
@@ -42,7 +39,7 @@ are determined to be duplicates by checking in order
 * length int - required
 * filename text - required
 * hash blob - not required, calculated when needed.
-* linkCount - default to 1 and incremented for each hard link
+* linkCount - default to 1 and incremented for each hard link.
 
 ## Strategy
 
