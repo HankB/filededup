@@ -150,7 +150,7 @@ func Example_findMatch() {
 	defer closeDataBase()
 
 	fileNames := []string{"another file", "another file.copy", "empty", "empty-01",
-		"README.md", "thing one", "thing two", "yet another file", "x", "y"}
+		"README.md", "thing one", "thing two", "yet another file", "x", "y", "z"}
 
 	for _, fname := range fileNames {
 		info, err := os.Stat("sample-files/" + fname)
@@ -180,6 +180,7 @@ func Example_findMatch() {
 	// yet another file, false, , 2f240ab9499d7988e28288f41967a562 .
 	// x, false, ,  .
 	// y, false, ,  .
+	// z, true, sample-files/x, 401b30e3b8b5d629635a5c613cdb7919 .
 	// 22|sample-files/another file|B2ED2FD7FF0DC6DE08C32072E40AA6BC|1
 	// 0|sample-files/empty||1
 	// 440|sample-files/README.md||1
