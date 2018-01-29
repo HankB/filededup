@@ -4,5 +4,6 @@
 # Link is not preserved by git.
 #
 
+echo x > sample-files/z
 echo x > sample-files/x
 ln sample-files/x sample-files/y
