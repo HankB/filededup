@@ -4,6 +4,7 @@ package main
  */
 
 import (
+	"fmt"
 	"os"
 
 	flags "github.com/jessevdk/go-flags"
@@ -27,4 +28,14 @@ func parseArgs() {
 			os.Exit(1)
 		}
 	}
+}
+
+// printf() provides prioritized output using fmt.Printf
+// Three level priority 0 => critical, 1 => warnings, 2 => info
+const priCritcl = 0 // print only if critical messages are displayed
+const priWarn = 1   // print errors normally expected to occur
+const priInfo = 2   // print everything including normal
+
+func printf(pri int, format string, args ...interface{}) {
+	fmt.Printf(format, args...)
 }
