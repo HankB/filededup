@@ -1,5 +1,8 @@
 package main
 
+/** Core logic for file deduplication via hard linking
+*/
+
 import (
 	"bytes"
 	"crypto/md5"
@@ -14,7 +17,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-/* return largest of two arguments
+/* return smaller of two arguments
  */
 func min(a, b int64) int64 {
 	if a <= b {

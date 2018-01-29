@@ -1,5 +1,8 @@
 package main
 
+/** Miscellaneous code not otherwise related to the core functionality
+ */
+
 import (
 	"os"
 
