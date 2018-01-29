@@ -33,6 +33,7 @@ are determined to be duplicates by checking in order
 ## Requirements
 
 * `go get github.com/mattn/go-sqlite3`
+* `go get github.com/jessevdk/go-flags`
 
 ## Database
 
