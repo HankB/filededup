@@ -37,5 +37,7 @@ const priWarn = 1   // print errors normally expected to occur
 const priInfo = 2   // print everything including normal
 
 func printf(pri int, format string, args ...interface{}) {
-	fmt.Printf(format, args...)
+	if pri <= len(options.Verbose) {
+		fmt.Printf(format, args...)
+	}
 }
