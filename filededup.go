@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/jessevdk/go-flags"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -266,29 +265,8 @@ func closeDataBase() {
 	db.Close()
 }
 
-// Options lists command line arguments
-type Options struct {
-	// Example of verbosity with level
-	Verbose   []bool `short:"v" long:"verbose" description:"Verbose output"`
-	Directory string `short:"d" long:"dir" description:"Directory to start" default:"."`
-}
-
-var options Options
-var parser = flags.NewParser(&options, flags.Default)
-
-
-func parseArgs() {
-	if _, err := parser.Parse(); err != nil {
-		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
-			os.Exit(0)
-		} else {
-			os.Exit(1)
-		}
-	}
-}
-
 func main() {
-
+	parseArgs()
 	initDataBase("sqlite3", dbName)
 	defer closeDataBase()
 	filepath.Walk("./sample-files", myWalkFunc)
