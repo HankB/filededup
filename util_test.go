@@ -11,33 +11,27 @@ import (
 	"os"
 )
 
-func Example_psrseArgs() {
-	os.Args = []string{"progname"}
+func checkArgs(args []string) {
+	os.Args = args
 	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory)
+	fmt.Println(len(options.Verbose), options.Directory, options.Trial)
+}
 
-	os.Args = []string{"progname", "-v"}
-	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory)
-
-	os.Args = []string{"progname", "-vv"}
-	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory)
-
-	os.Args = []string{"progname", "--verbose", "-d", "/somedir"}
-	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory)
-
-	os.Args = []string{"progname", "-d", "/anotherdir"}
-	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory)
+func Example_parseArgs() {
+	checkArgs([]string{"progname"})
+	checkArgs([]string{"progname", "-v"})
+	checkArgs([]string{"progname", "-vv"})
+	checkArgs([]string{"progname", "--verbose", "-d", "/somedir"})
+	checkArgs([]string{"progname", "-d", "/anotherdir"})
+	checkArgs([]string{"progname", "-t", "--dir", "."})
 
 	// Output:
-	// 0 .
-	// 1 .
-	// 2 .
-	// 1 /somedir
-	// 1 /anotherdir
+	// 0 . false
+	// 1 . false
+	// 2 . false
+	// 1 /somedir false
+	// 1 /anotherdir false
+	// 1 . true
 }
 func Example_printf() {
 	options.Verbose = []bool{}
