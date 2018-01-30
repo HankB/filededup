@@ -69,7 +69,7 @@ func Example_insertFile() {
 
 func TestCompareByteByByte(t *testing.T) {
 
-	if err := exec.Command("/bin/sh", "./prep_compare_files.sh").Run(); err != nil {
+	if err := exec.Command("/bin/sh", "./testing/prep_compare_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -94,7 +94,7 @@ func TestCompareByteByByte(t *testing.T) {
 		t.Fatal("cmpfile.5120-1, cmpfile.5120-3 match")
 	}
 
-	if err = exec.Command("/bin/sh", "./rm_compare_files.sh").Run(); err != nil {
+	if err = exec.Command("/bin/sh", "./testing/rm_compare_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -125,7 +125,7 @@ func checkLink(foo, baz string) bool {
 
 func TestLinkFile(t *testing.T) {
 
-	if err := exec.Command("/bin/sh", "./prep_link_files.sh").Run(); err != nil {
+	if err := exec.Command("/bin/sh", "./testing/prep_link_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -134,7 +134,7 @@ func TestLinkFile(t *testing.T) {
 		t.Fatal("\"a\" \"b\" not linked\n")
 	}
 
-	if err := exec.Command("/bin/sh", "./rm_link_files.sh").Run(); err != nil {
+	if err := exec.Command("/bin/sh", "./testing/rm_link_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -142,7 +142,7 @@ func TestLinkFile(t *testing.T) {
 
 func Example_findMatch() {
 
-	if err := exec.Command("/bin/sh", "./prep_findmatch_files.sh").Run(); err != nil {
+	if err := exec.Command("/bin/sh", "./testing/prep_findmatch_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -164,7 +164,7 @@ func Example_findMatch() {
 		}
 
 	}
-	if err := exec.Command("/bin/sh", "./rm_findmatch_files.sh").Run(); err != nil {
+	if err := exec.Command("/bin/sh", "./testing/rm_findmatch_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
 	dumpDatabase()
@@ -190,4 +190,3 @@ func Example_findMatch() {
 	// 2|sample-files/x||1
 	// 2|sample-files/y||1
 }
-
