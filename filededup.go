@@ -1,7 +1,7 @@
 package main
 
 /** Core logic for file deduplication via hard linking
-*/
+ */
 
 import (
 	"bytes"
@@ -31,12 +31,16 @@ func min(a, b int64) int64 {
 func getHash(filename string) []byte {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		printf(priWarn, "getHash(): %v\n", err)
+		return []byte{0}
 	}
 	defer f.Close()
 	h := md5.New()
 	if _, err := io.Copy(h, f); err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		printf(priWarn, "getHash(): %v\n", err)
+		return []byte{0}
 	}
 	return h.Sum(nil)
 }

@@ -32,11 +32,26 @@ func TestMin(t *testing.T) {
 }
 
 func Example_getHash() {
+	if err := exec.Command("/bin/sh", "./testing/prep_gethash_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
 	fmt.Printf("hash %x\n", getHash("sample-files/another file"))
 	fmt.Printf("hash %x\n", getHash("sample-files/yet another file"))
+	fmt.Printf("hash %x\n", getHash("foo"))
+	options.Verbose = []bool{true}
+	fmt.Printf("hash %x\n", getHash("foo"))
+
+	if err := exec.Command("/bin/sh", "./testing/rm_gethash_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
 	// Output:
 	// hash b2ed2fd7ff0dc6de08c32072e40aa6bc
 	// hash 2f240ab9499d7988e28288f41967a562
+	// hash 00
+	// getHash(): open foo: permission denied
+	// hash 00
 }
 
 func dumpDatabase() {
