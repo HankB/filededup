@@ -39,7 +39,7 @@ func Example_getHash() {
 	fmt.Printf("hash %x\n", getHash("sample-files/another file"))
 	fmt.Printf("hash %x\n", getHash("sample-files/yet another file"))
 	fmt.Printf("hash %x\n", getHash("foo"))
-	options.Verbose = []bool{true}
+	setPrintfPri(priWarn)
 	fmt.Printf("hash %x\n", getHash("foo"))
 
 	if err := exec.Command("/bin/sh", "./testing/rm_gethash_files.sh").Run(); err != nil {
@@ -64,7 +64,7 @@ func dumpDatabase() {
 }
 
 func Example_insertFile() {
-	options.Verbose = []bool{true}
+	setPrintfPri(priWarn)
 	initDataBase("sqlite3", "test.db")
 	//
 	defer closeDataBase()
@@ -119,6 +119,46 @@ func TestCompareByteByByte(t *testing.T) {
 		log.Fatal(err)
 	}
 
+}
+
+// ExampleCompareByteByByte provokes various errors
+func Example_compareByteByByte() {
+	setPrintfPri(priWarn)
+	if err := exec.Command("/bin/sh", "./testing/prep_gethash_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	if compareByteByByte("foo", "foo", 0) { // provoke 'permission denied'
+		printf(priWarn, "foo, foo match")
+	}
+
+	if compareByteByByte("README.md", "cmpfile.5120-3", 5120) { // provoke 'no such file or directory'
+		printf(priWarn, "cmpfile.5120-1, cmpfile.5120-3 match")
+	}
+
+	if compareByteByByte("cmpfile.5120-3", "README.md", 5120) { // provoke 'no such file or directory'
+		printf(priWarn, "cmpfile.5120-1, cmpfile.5120-3 match")
+	}
+
+	if compareByteByByte("sample-files/empty", "sample-files/thing one", 64) { // provoke 'EOF'
+		printf(priWarn, "sample-files/empty sample-files/thing one match")
+	}
+
+	if compareByteByByte("sample-files/thing one", "sample-files/empty", 64) { // provoke 'EOF'
+		printf(priWarn, "sample-files/empty sample-files/thing one match")
+	}
+
+	if err := exec.Command("/bin/sh", "./testing/rm_gethash_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+	// Output:
+	// compareByteByByte(1): open foo: permission denied
+	// compareByteByByte(2): open cmpfile.5120-3: no such file or directory
+	// compareByteByByte(1): open cmpfile.5120-3: no such file or directory
+	// compareByteByByte(3): sample-files/empty: EOF
+	// compareByteByByte(4): expected 64 got 0 bytes
+	// compareByteByByte(5): sample-files/empty: EOF
+	// compareByteByByte(6): expected 64 got 0 bytes
 }
 
 func checkLink(foo, baz string) bool {
