@@ -31,14 +31,12 @@ func min(a, b int64) int64 {
 func getHash(filename string) []byte {
 	f, err := os.Open(filename)
 	if err != nil {
-		//log.Fatal(err)
 		printf(priWarn, "getHash(): %v\n", err)
 		return []byte{0}
 	}
 	defer f.Close()
 	h := md5.New()
 	if _, err := io.Copy(h, f); err != nil {
-		//log.Fatal(err)
 		printf(priWarn, "getHash(): %v\n", err)
 		return []byte{0}
 	}
@@ -89,13 +87,15 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 
 	file1, err := os.Open(f1)
 	if err != nil {
-		log.Fatal(err)
+		printf(priWarn, "compareByteByByte(1): %v\n", err)
+		return false
 	}
 	defer file1.Close()
 
 	file2, err := os.Open(f2)
 	if err != nil {
-		log.Fatal(err)
+		printf(priWarn, "compareByteByByte(2): %v\n", err)
+		return false
 	}
 	defer file2.Close()
 
@@ -104,21 +104,22 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 	for bytesRead = 0; bytesRead < len; bytesRead += min(blocksize, len-bytesRead) {
 		read1, err := file1.Read(buf1[0:min(blocksize, len-bytesRead)])
 		if err != nil {
-			log.Fatal("bytes read:", read1, " ", err)
+			printf(priWarn, "compareByteByByte(3): %s: %v\n", f1, err)
 		}
 		if int64(read1) < min(blocksize, len-bytesRead) {
-			log.Fatal("Expected ", min(blocksize, len-bytesRead), " bytes got ", read1)
+			printf(priWarn, "compareByteByByte(4): expected %d got %d bytes\n",
+				min(blocksize, len-bytesRead), read1)
 		}
 
 		read2, err := file2.Read(buf2[0:min(blocksize, len-bytesRead)])
 		if err != nil {
-			log.Fatal(err)
+			printf(priWarn, "compareByteByByte(5): %s: %v\n", f2, err)
 		}
 		if int64(read2) < min(blocksize, len-bytesRead) {
-			log.Fatal("Expected ", min(blocksize, len-bytesRead), " bytes got ", read2)
+			printf(priWarn, "compareByteByByte(6): expected %d got %d bytes\n",
+				min(blocksize, len-bytesRead), read2)
 		}
 
-		//fmt.Printf("comparing bytes read:%d, %d: %d\n", read1, read2, bytes.Compare(buf1[0:read1], buf2[0:read2]))
 		if bytes.Compare(buf1[0:read1], buf2[0:read2]) != 0 { // matching byes?
 			return false
 		}
