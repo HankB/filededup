@@ -14,11 +14,11 @@ import (
 func checkArgs(args []string) {
 	os.Args = args
 	parseArgs()
-	fmt.Println(len(options.Verbose), options.Directory, options.Trial)
+	fmt.Println(setPrintfPri(priCritcl), options.Directory, options.Trial)
 }
 
 func Example_parseArgs() {
-	options.Verbose = []bool{}
+	setPrintfPri(priCritcl)
 	checkArgs([]string{"progname"})
 	checkArgs([]string{"progname", "-v"})
 	checkArgs([]string{"progname", "-vv"})
@@ -35,15 +35,15 @@ func Example_parseArgs() {
 	// 1 . true
 }
 func Example_printf() {
-	options.Verbose = []bool{}
+	setPrintfPri(priCritcl)
 	printf(priCritcl, "this is critical output\n")
 	printf(priInfo, "this is informational output\n")
 	printf(priWarn, "this is warning output\n")
-	options.Verbose = []bool{true}
+	setPrintfPri(priWarn)
 	printf(priCritcl, "this is critical output 2\n")
 	printf(priInfo, "this is informational output 2\n")
 	printf(priWarn, "this is warning output 2\n")
-	options.Verbose = []bool{true, true}
+	setPrintfPri(priInfo)
 	printf(priCritcl, "this is critical output 3\n")
 	printf(priInfo, "this is informational output 3\n")
 	printf(priWarn, "this is warning output 3\n")
