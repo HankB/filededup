@@ -33,12 +33,16 @@ func parseArgs() {
 
 // printf() provides prioritized output using fmt.Printf
 // Three level priority 0 => critical, 1 => warnings, 2 => info
-const priCritcl = 0 // print only if critical messages are displayed
-const priWarn = 1   // print errors normally expected to occur
-const priInfo = 2   // print everything including normal
+type pri int
 
-func printf(pri int, format string, args ...interface{}) {
-	if pri <= len(options.Verbose) {
+const (
+	priCritcl pri = iota // print only if critical messages are displayed
+	priWarn              // print errors normally expected to occur
+	priInfo              // print everything including normal
+)
+
+func printf(p pri, format string, args ...interface{}) {
+	if int(p) <= len(options.Verbose) {
 		fmt.Printf(format, args...)
 	}
 }
