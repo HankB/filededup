@@ -64,7 +64,9 @@ func dumpDatabase() {
 }
 
 func Example_insertFile() {
+	options.Verbose = []bool{true}
 	initDataBase("sqlite3", "test.db")
+	//
 	defer closeDataBase()
 
 	insertFile("test file", 33, []byte("abcd"))
@@ -74,12 +76,16 @@ func Example_insertFile() {
 	updateHash("test file", []byte("cba"))
 	updateHash("test file 3", []byte("xyz"))
 	dumpDatabase()
-
+	updateHash("no such file", []byte("cba"))
+	closeDataBase()
+	updateHash("test file", []byte("cba"))
 	// Output:
 	// 33|test file|61626364|1
 	// 333|test file 3||1
 	// 33|test file|636261|1
 	// 333|test file 3|78797A|1
+	// updateHash(3): 0 rows affected
+	// updateHash(1): sql: database is closed
 }
 
 func TestCompareByteByByte(t *testing.T) {

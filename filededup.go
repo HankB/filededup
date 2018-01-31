@@ -66,14 +66,14 @@ func updateHash(filePath string, hash []byte) {
 	result, err := db.Exec(`update files set hash = ? where filename = ?`,
 		hash, filePath)
 	if err != nil {
-		log.Fatal(err)
+		printf(priWarn, "updateHash(1): %v\n", err)
 	} else {
 		rowCount, err := result.RowsAffected()
 		if err != nil {
-			log.Fatal(err)
+			printf(priWarn, "updateHash(2): %v\n", err)
 		} else {
 			if rowCount != 1 {
-				log.Fatalf("hash update affected %d\n", rowCount)
+				printf(priWarn, "updateHash(3): %d rows affected\n", rowCount)
 			}
 		}
 	}
