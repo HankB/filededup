@@ -18,6 +18,7 @@ func checkArgs(args []string) {
 }
 
 func Example_parseArgs() {
+	options.Verbose = []bool{}
 	checkArgs([]string{"progname"})
 	checkArgs([]string{"progname", "-v"})
 	checkArgs([]string{"progname", "-vv"})
