@@ -31,7 +31,9 @@ are determined to be duplicates by checking in order
 * race conditions matching and then performing the link/replace operation.
 
 ## Requirements
+(Relative to a default Ubuntu 16.04 desktop install.)
 
+* `sudo apt install sqlite3`
 * `go get github.com/mattn/go-sqlite3`
 * `go get github.com/jessevdk/go-flags`
 
