@@ -34,6 +34,7 @@ are determined to be duplicates by checking in order
 
 * `go get github.com/mattn/go-sqlite3`
 * `go get github.com/jessevdk/go-flags`
+* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives)
 
 ## Database
 
