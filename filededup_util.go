@@ -15,7 +15,8 @@ type Options struct {
 	// Example of verbosity with level
 	Verbose   []bool `short:"v" long:"verbose" description:"Verbose output"`
 	Directory string `short:"d" long:"dir" description:"Directory to start" default:"."`
-	Trial     bool   `short:"t" long:"trial" description:"report actions instead of performing operations"`
+	Trial     bool   `short:"t" long:"trial" description:"report instead of performing operations"`
+	Summary   bool   `short:"s" long:"summary" description:"print summary of operations"`
 }
 
 var options Options
