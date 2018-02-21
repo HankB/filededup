@@ -11,16 +11,41 @@ are determined to be duplicates by checking in order
 1. MD5 hash
 1. byte by byte comparison
 
+## Command line arguments
+
+``` shell
+hbarta@olive:~/Documents/go-work/src/oak/HankB/filededup$ go run filededup.go filededup_util.go -h
+Usage:
+  filededup [OPTIONS]
+
+Application Options:
+  -v, --verbose  Verbose output
+  -d, --dir=     Directory to start (default: .)
+  -t, --trial    report instead of performing operations
+  -s, --summary  print summary of operations
+
+Help Options:
+  -h, --help     Show this help message
+```
+
+### Verbosity
+
+    (default) Report only fatal errors (to STDERR via `log.Fatal()`)
+    --verbosity / -v => Report all errors including those that do not terminate operation.
+    -vv => Report all operations. Will produce at least one line per file examined.
+
 ## Status
 
-* Three comparisoins (length, MD5 hash, byte by byte comparison) working for a small set of test files
-* copy permissions and ownership to link not yet implemented.
+* Three comparisons (length, MD5 hash, byte by byte comparison) working for a small set of test files
+* Collect and report statistics for summary.
+* Error and status reporting (--verbosity)
+* test as root.
+* Implement actual algorithm (not just all o0f the tests.)
 
 ## Testing
 
 * `go test` from the project root to run Go tests. (Or run individual tests from within VS code)
-* `go run filededup.go` to run the main application which is a sort of manual test.
-
+* `go run filededup.go filededup_util.go -s some-test-dir` to run the main application which is a sort of manual test. Note that if this is executed without the `-d` argument it will link files in the `sample-files` directory.
 
 ## Issues/Challenges
 
@@ -31,6 +56,7 @@ are determined to be duplicates by checking in order
 * race conditions matching and then performing the link/replace operation.
 
 ## Requirements
+
 (Relative to a default Ubuntu 16.04 desktop install.)
 
 * `sudo apt install sqlite3`
