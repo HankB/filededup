@@ -90,7 +90,7 @@ Punchlist:
 
 ## Testing
 
-* `go test` from the project root to run Go tests. (Or run individual tests from within VS code)
+* `go test` from the project root to run `go` tests. (Or run individual tests from within VS code)
 * `go run filededup.go filededup_util.go -s some-test-dir` to run the main application which is a sort of manual test. Note that if this is executed without the `-d` argument it will link files in the project directory.
 * Further testing is performed on larget data sets utilizing the ZFS filesystem. This is chosen because I have a new backup server not yet commissioned on which to test. Since ZFS implements snapshots I can snapshot the filesystem, test and revert to test again.
 
@@ -98,7 +98,7 @@ Punchlist:
 
 * Need to address file permissions - cannot link a file we cannot delete. Note: Permissions and ownership match the file linked to.
 * Command line arguments - directory, verbosity, version. (version not yet implemented)
-* file permissions: file/directory permissions may prevent replacing a fle with a link. 
+* file permissions: file/directory permissions may prevent replacing a fle with a link. (In this case an error will be reported given sufficient verbosity.)
 * Changing file ownership requires root priveledge.
 * race conditions matching and then performing the link/replace operation.
 
