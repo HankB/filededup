@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"crypto/md5"
 	"database/sql"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -31,12 +30,14 @@ func min(a, b int64) int64 {
 func getHash(filename string) []byte {
 	f, err := os.Open(filename)
 	if err != nil {
+		warnings++
 		printf(priWarn, "getHash(): %v\n", err)
 		return []byte{0}
 	}
 	defer f.Close()
 	h := md5.New()
 	if _, err := io.Copy(h, f); err != nil {
+		warnings++
 		printf(priWarn, "getHash(): %v\n", err)
 		return []byte{0}
 	}
@@ -64,13 +65,16 @@ func updateHash(filePath string, hash []byte) {
 	result, err := db.Exec(`update files set hash = ? where filename = ?`,
 		hash, filePath)
 	if err != nil {
+		warnings++
 		printf(priWarn, "updateHash(1): %v\n", err)
 	} else {
 		rowCount, err := result.RowsAffected()
 		if err != nil {
+			warnings++
 			printf(priWarn, "updateHash(2): %v\n", err)
 		} else {
 			if rowCount != 1 {
+				warnings++
 				printf(priWarn, "updateHash(3): %d rows affected\n", rowCount)
 			}
 		}
@@ -87,6 +91,7 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 
 	file1, err := os.Open(f1)
 	if err != nil {
+		warnings++
 		printf(priWarn, "compareByteByByte(1): %v\n", err)
 		return false
 	}
@@ -94,6 +99,7 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 
 	file2, err := os.Open(f2)
 	if err != nil {
+		warnings++
 		printf(priWarn, "compareByteByByte(2): %v\n", err)
 		return false
 	}
@@ -104,18 +110,22 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 	for bytesRead = 0; bytesRead < len; bytesRead += min(blocksize, len-bytesRead) {
 		read1, err := file1.Read(buf1[0:min(blocksize, len-bytesRead)])
 		if err != nil {
+			warnings++
 			printf(priWarn, "compareByteByByte(3): %s: %v\n", f1, err)
 		}
 		if int64(read1) < min(blocksize, len-bytesRead) {
+			warnings++
 			printf(priWarn, "compareByteByByte(4): expected %d got %d bytes\n",
 				min(blocksize, len-bytesRead), read1)
 		}
 
 		read2, err := file2.Read(buf2[0:min(blocksize, len-bytesRead)])
 		if err != nil {
+			warnings++
 			printf(priWarn, "compareByteByByte(5): %s: %v\n", f2, err)
 		}
 		if int64(read2) < min(blocksize, len-bytesRead) {
+			warnings++
 			printf(priWarn, "compareByteByByte(6): expected %d got %d bytes\n",
 				min(blocksize, len-bytesRead), read2)
 		}
@@ -227,14 +237,22 @@ func replaceWithLink(oldName, newName string) {
 // callback from Walk()
 func myWalkFunc(path string, info os.FileInfo, err error) error {
 	if info.Mode()&os.ModeType != 0 { // not a regular file?
-		fmt.Printf("other: %s\n", path)
+		printf(priInfo, "skipping: \"%s\"\n", path)
 	} else {
-		fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
+		//fmt.Printf("checking len: %d name: %s\n", info.Size(), path)
 		found, matchPath, hash := findMatch(path, info)
-		fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
+		filesConsidered++
+		//fmt.Printf("%t, %s, %x\n\n", found, matchPath, hash)
 		if found {
+			printf(priInfo, "replacing \"%s\" with link to \"%s\"\n", path, matchPath)
+			filesLinked++
 			// TODO link files
+
+			if !options.Trial {
+				replaceWithLink(matchPath, path)
+			}
 		} else {
+			printf(priInfo, "no match for \"%s\"\n", path)
 			insertFile(path, info.Size(), hash)
 		}
 	}
@@ -273,10 +291,20 @@ func closeDataBase() {
 	db.Close()
 }
 
+var filesConsidered uint64
+var filesLinked uint64
+var warnings uint64
+var bytesSaved uint64
+
 func main() {
 	parseArgs()
 	initDataBase("sqlite3", dbName)
 	defer closeDataBase()
-	filepath.Walk("./sample-files", myWalkFunc)
-
+	filepath.Walk(options.Directory, myWalkFunc)
+	if options.Summary {
+		printf(priCritcl, "Verbosity %d, Directory \"%s\", Trial %t, Summary %t\n",
+			len(options.Verbose), options.Directory, options.Trial, options.Summary)
+		printf(priCritcl, "%d files %d linked, %d bytes saved, %d warnings\n",
+			filesConsidered, filesLinked, bytesSaved, warnings)
+	}
 }
