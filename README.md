@@ -1,6 +1,6 @@
 # filededup
 
-File deduplication utility. (ssh://git@oak:10022/HankB/filededup.git)
+File deduplication utility.
 
 ## Motivation
 
