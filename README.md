@@ -37,10 +37,7 @@ Help Options:
 ## Status
 
 * Three comparisons (length, MD5 hash, byte by byte comparison) working for a small set of test files
-* Collect and report statistics for summary.
-* Error and status reporting (--verbosity)
 * test as root.
-* Implement actual algorithm (not just all o0f the tests.)
 
 ## Testing
 
