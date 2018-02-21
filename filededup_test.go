@@ -281,7 +281,7 @@ func Example_main() {
 	// no match for "some-test-dir/thing two"
 	// no match for "some-test-dir/yet another file"
 	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true
-	// 8 files 2 linked, 0 bytes saved, 0 warnings
+	// 8 files 2 linked, 22 bytes saved, 0 warnings
 	//  some-test-dir/another file
 	//  some-test-dir/another file.copy
 	//  some-test-dir/empty
