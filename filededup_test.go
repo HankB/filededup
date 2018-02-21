@@ -251,3 +251,38 @@ func Example_findMatch() {
 	// 2|sample-files/x||1
 	// 2|sample-files/y||1
 }
+
+func Example_main() {
+
+	if err := exec.Command("/bin/sh", "./testing/prep_main_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	os.Args = []string{"progname", "-vv", "-d", "some-test-dir", "-s"}
+	parseArgs()
+	main()
+
+	if resp, err := exec.Command("/bin/sh", "./testing/rm_main_files.sh").Output(); err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println(string(resp))
+	}
+
+	// Output:
+	// skipping: "some-test-dir"
+	// no match for "some-test-dir/README.md"
+	// no match for "some-test-dir/another file"
+	// replacing "some-test-dir/another file.copy" with link to "some-test-dir/another file"
+	// no match for "some-test-dir/empty"
+	// replacing "some-test-dir/empty-01" with link to "some-test-dir/empty"
+	// no match for "some-test-dir/thing one"
+	// no match for "some-test-dir/thing two"
+	// no match for "some-test-dir/yet another file"
+	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true
+	// 8 files 2 linked, 0 bytes saved, 0 warnings
+	//  some-test-dir/empty-01
+	//  some-test-dir/empty
+	//  some-test-dir/another file.copy
+	//  some-test-dir/another file
+
+}
