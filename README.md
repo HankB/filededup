@@ -1,6 +1,6 @@
 # filededup
 
-File deduplication utility.
+File deduplication utility. Find identical files and hard link them together.
 
 ## Motivation
 
