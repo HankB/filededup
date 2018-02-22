@@ -221,13 +221,16 @@ func replaceWithLink(oldName, newName string) {
 		err := os.Link(oldName, tmpName)
 		if err != nil {
 			if !os.IsExist(err) {
-				log.Fatal(err)
+				printf(priWarn, "Cannot link\"%s\" to \"%s\" :  %s\n",
+					oldName, tmpName, err.Error())
+				return
 			}
 		} else {
 			// rename temporary to newFile which will overwrite with the link
 			err = os.Rename(tmpName, newName)
 			if err != nil {
-				log.Fatal(err)
+				printf(priWarn, "Cannot rename\"%s\" to \"%s\" :  %s\n",
+					tmpName, newName, err.Error())
 			}
 			return
 		}
