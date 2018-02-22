@@ -195,6 +195,11 @@ func TestLinkFile(t *testing.T) {
 		t.Fatal("\"a\" \"b\" not linked\n")
 	}
 
+	replaceWithLink("test_dir/c", "test_dir/d")
+	if checkLink("test_dir/c", "test_dir/d") {
+		t.Fatal("\"test_dir/c\" \"test_dir/d\" are linked\n")
+	}
+
 	if err := exec.Command("/bin/sh", "./testing/rm_link_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
