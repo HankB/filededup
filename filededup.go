@@ -297,6 +297,12 @@ var warnings uint64
 var bytesSaved uint64
 
 func main() {
+	// initi stats here for the benefit of unit tests
+	filesConsidered = 0
+	filesLinked = 0
+	warnings = 0
+	bytesSaved = 0
+
 	parseArgs()
 	initDataBase("sqlite3", dbName)
 	defer closeDataBase()
