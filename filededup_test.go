@@ -259,6 +259,8 @@ func Example_main() {
 	}
 
 	os.Args = []string{"progname", "-vv", "-d", "some-test-dir", "-s"}
+	warnings = 0 // clear counters
+
 	parseArgs()
 	main()
 
@@ -279,10 +281,10 @@ func Example_main() {
 	// no match for "some-test-dir/thing two"
 	// no match for "some-test-dir/yet another file"
 	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true
-	// 8 files 2 linked, 0 bytes saved, 0 warnings
-	//  some-test-dir/empty-01
-	//  some-test-dir/empty
-	//  some-test-dir/another file.copy
+	// 8 files 2 linked, 22 bytes saved, 0 warnings
 	//  some-test-dir/another file
+	//  some-test-dir/another file.copy
+	//  some-test-dir/empty
+	//  some-test-dir/empty-01
 
 }

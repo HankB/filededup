@@ -44,7 +44,8 @@ func getHash(filename string) []byte {
 	return h.Sum(nil)
 }
 
-var dbName = "filelist.db"
+//var dbName = "filelist.db"
+var dbName = ":memory:"
 var db *sql.DB
 var err error
 var hashes map[string][]byte
@@ -246,7 +247,7 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 		if found {
 			printf(priInfo, "replacing \"%s\" with link to \"%s\"\n", path, matchPath)
 			filesLinked++
-			// TODO link files
+			bytesSaved += uint64(info.Size())
 
 			if !options.Trial {
 				replaceWithLink(matchPath, path)
