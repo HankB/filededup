@@ -13,12 +13,12 @@ import (
 
 func checkArgs(args []string) {
 	os.Args = args
-	parseArgs()
-	fmt.Println(setPrintfPri(priCritcl), options.Verbose, options.Directory, options.Trial, options.Summary)
 	options.Verbose = nil
 	options.Directory = "."
 	options.Trial = false
 	options.Summary = false
+	parseArgs()
+	fmt.Println(setPrintfPri(priCritcl), options.Verbose, options.Directory, options.Trial, options.Summary)
 }
 
 func Example_parseArgs() {
