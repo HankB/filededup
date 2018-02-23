@@ -4,6 +4,6 @@
 #
 
 # first report all linked files
-find some-test-dir -type f -printf '%n %p\n' | awk '$1 > 1{$1="";print}' | sort
+find some-test-dir -type f -printf '%n %p\n' | awk '$1 > 1{print}' | sort
 
 rm -r some-test-dir

@@ -278,18 +278,30 @@ func Example_main() {
 	// Output:
 	// skipping: "some-test-dir"
 	// no match for "some-test-dir/README.md"
+	// no match for "some-test-dir/a"
 	// no match for "some-test-dir/another file"
 	// replacing "some-test-dir/another file.copy" with link to "some-test-dir/another file"
+	// replacing "some-test-dir/b" with link to "some-test-dir/a"
+	// no match for "some-test-dir/c"
+	// no match for "some-test-dir/d"
+	// replacing "some-test-dir/e" with link to "some-test-dir/a"
 	// no match for "some-test-dir/empty"
 	// replacing "some-test-dir/empty-01" with link to "some-test-dir/empty"
+	// replacing "some-test-dir/f" with link to "some-test-dir/a"
 	// no match for "some-test-dir/thing one"
 	// no match for "some-test-dir/thing two"
 	// no match for "some-test-dir/yet another file"
 	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true
-	// 8 files 2 linked, 22 bytes saved, 0 warnings
-	//  some-test-dir/another file
-	//  some-test-dir/another file.copy
-	//  some-test-dir/empty
-	//  some-test-dir/empty-01
+	// 14 files 5 linked, 58 bytes saved, 0 warnings
+	// 2 some-test-dir/another file
+	// 2 some-test-dir/another file.copy
+	// 2 some-test-dir/empty
+	// 2 some-test-dir/empty-01
+	// 6 some-test-dir/a
+	// 6 some-test-dir/b
+	// 6 some-test-dir/c
+	// 6 some-test-dir/d
+	// 6 some-test-dir/e
+	// 6 some-test-dir/f
 
 }
