@@ -170,23 +170,29 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 			log.Fatal(err)
 		}
 		if !os.SameFile(filepathInfo, info) {
-			if possMatchHash == nil { //need hash for the possible match?
-				possMatchHash = getHash(possMatchFilename)
-				// save hashes to update after the present query is closed
-				if hashes == nil {
-					hashes = make(map[string][]byte)
+			if !options.Nohash {			
+				if possMatchHash == nil { //need hash for the possible match?
+					possMatchHash = getHash(possMatchFilename)
+					// save hashes to update after the present query is closed
+					if hashes == nil {
+						hashes = make(map[string][]byte)
+					}
+					hashes[possMatchFilename] = possMatchHash // update later
 				}
-				hashes[possMatchFilename] = possMatchHash // update later
-			}
-			if hashCandidate == nil {
-				hashCandidate = getHash(filepath)
-			}
-			if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
-				if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
-					return true, possMatchFilename, possMatchHash
+				if hashCandidate == nil {
+					hashCandidate = getHash(filepath)
 				}
+				if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
+					if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
+						return true, possMatchFilename, possMatchHash
+					}
+				}
+			} else {
+			if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
+				return true, possMatchFilename, []byte{0}
 			}
 		}
+	}
 	}
 
 	if err := rows.Err(); err != nil {
@@ -315,8 +321,9 @@ func main() {
 	defer closeDataBase()
 	filepath.Walk(options.Directory, myWalkFunc)
 	if options.Summary {
-		printf(priCritcl, "Verbosity %d, Directory \"%s\", Trial %t, Summary %t\n",
-			len(options.Verbose), options.Directory, options.Trial, options.Summary)
+		printf(priCritcl, "Verbosity %d, Directory \"%s\", Trial %t, Summary %t Nohash %t\n",
+			len(options.Verbose), options.Directory, options.Trial, 
+			options.Summary, options.Nohash)
 		printf(priCritcl, "%d files %d linked, %d bytes saved, %d warnings\n",
 			filesConsidered, filesLinked, bytesSaved, warnings)
 	}
