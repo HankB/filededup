@@ -170,7 +170,7 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 			log.Fatal(err)
 		}
 		if !os.SameFile(filepathInfo, info) {
-			if !options.Nohash {			
+			if options.Usehash {
 				if possMatchHash == nil { //need hash for the possible match?
 					possMatchHash = getHash(possMatchFilename)
 					// save hashes to update after the present query is closed
@@ -188,11 +188,11 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 					}
 				}
 			} else {
-			if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
-				return true, possMatchFilename, []byte{0}
+				if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
+					return true, possMatchFilename, []byte{0}
+				}
 			}
 		}
-	}
 	}
 
 	if err := rows.Err(); err != nil {
@@ -321,9 +321,9 @@ func main() {
 	defer closeDataBase()
 	filepath.Walk(options.Directory, myWalkFunc)
 	if options.Summary {
-		printf(priCritcl, "Verbosity %d, Directory \"%s\", Trial %t, Summary %t Nohash %t\n",
-			len(options.Verbose), options.Directory, options.Trial, 
-			options.Summary, options.Nohash)
+		printf(priCritcl, "Verbosity %d, Directory \"%s\", Trial %t, Summary %t, Usehash %t\n",
+			len(options.Verbose), options.Directory, options.Trial,
+			options.Summary, options.Usehash)
 		printf(priCritcl, "%d files %d linked, %d bytes saved, %d warnings\n",
 			filesConsidered, filesLinked, bytesSaved, warnings)
 	}
