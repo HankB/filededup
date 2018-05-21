@@ -206,11 +206,14 @@ func TestLinkFile(t *testing.T) {
 
 }
 
-func Example_findMatch() {
+func Example_findMatchUseHash() {
 
 	if err := exec.Command("/bin/sh", "./testing/prep_findmatch_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
+
+	useHash := options.Usehash
+	options.Usehash = true
 
 	initDataBase("sqlite3", "test.db")
 	defer closeDataBase()
@@ -233,6 +236,8 @@ func Example_findMatch() {
 	if err := exec.Command("/bin/sh", "./testing/rm_findmatch_files.sh").Run(); err != nil {
 		log.Fatal(err)
 	}
+	options.Usehash = useHash
+
 	dumpDatabase()
 
 	// Output:
@@ -257,6 +262,61 @@ func Example_findMatch() {
 	// 2|sample-files/y||1
 }
 
+func Example_findMatchNoHash() {
+
+	if err := exec.Command("/bin/sh", "./testing/prep_findmatch_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	useHash := options.Usehash
+	options.Usehash = false
+
+	initDataBase("sqlite3", "test.db")
+	defer closeDataBase()
+
+	fileNames := []string{"another file", "another file.copy", "empty", "empty-01",
+		"README.md", "thing one", "thing two", "yet another file", "x", "y", "z"}
+
+	for _, fname := range fileNames {
+		info, err := os.Stat("sample-files/" + fname)
+		if err != nil {
+			log.Fatal(err)
+		}
+		matched, matchName, hash := findMatch("sample-files/"+fname, info)
+		fmt.Printf("%s, %t, %s, %x .\n", fname, matched, matchName, hash)
+		if !matched {
+			insertFile("sample-files/"+fname, info.Size(), hash)
+		}
+
+	}
+	if err := exec.Command("/bin/sh", "./testing/rm_findmatch_files.sh").Run(); err != nil {
+		log.Fatal(err)
+	}
+	options.Usehash = useHash
+
+	dumpDatabase()
+
+	// Output:
+	// another file, false, ,  .
+	// another file.copy, true, sample-files/another file, 00 .
+	// empty, false, ,  .
+	// empty-01, true, sample-files/empty, 00 .
+	// README.md, false, ,  .
+	// thing one, false, ,  .
+	// thing two, false, ,  .
+	// yet another file, false, ,  .
+	// x, false, ,  .
+	// y, false, ,  .
+	// z, true, sample-files/x, 00 .
+	// 22|sample-files/another file||1
+	// 0|sample-files/empty||1
+	// 440|sample-files/README.md||1
+	// 64|sample-files/thing one||1
+	// 64|sample-files/thing two||1
+	// 22|sample-files/yet another file||1
+	// 2|sample-files/x||1
+	// 2|sample-files/y||1
+}
 func Example_main() {
 
 	if err := exec.Command("/bin/sh", "./testing/prep_main_files.sh").Run(); err != nil {
@@ -291,7 +351,7 @@ func Example_main() {
 	// no match for "some-test-dir/thing one"
 	// no match for "some-test-dir/thing two"
 	// no match for "some-test-dir/yet another file"
-	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true
+	// Verbosity 2, Directory "some-test-dir", Trial false, Summary true, Usehash false
 	// 14 files 5 linked, 58 bytes saved, 0 warnings
 	// 2 some-test-dir/another file
 	// 2 some-test-dir/another file.copy
