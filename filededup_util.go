@@ -17,7 +17,7 @@ type Options struct {
 	Directory string `short:"d" long:"dir" description:"Directory to start" default:"."`
 	Trial     bool   `short:"t" long:"trial" description:"report instead of performing operations"`
 	Summary   bool   `short:"s" long:"summary" description:"print summary of operations"`
-	Usehash   bool   `short:"n" long:"nohash" description:"Don't use hash to test match"`
+	Usehash   bool   `short:"u" long:"usehash" description:"Use hash to test match"`
 }
 
 var options Options
