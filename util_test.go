@@ -18,7 +18,8 @@ func checkArgs(args []string) {
 	options.Trial = false
 	options.Summary = false
 	parseArgs()
-	fmt.Println(setPrintfPri(priCritcl), options.Verbose, options.Directory, options.Trial, options.Summary)
+	fmt.Println(setPrintfPri(priCritcl), options.Verbose, options.Directory,
+		options.Trial, options.Summary, options.Usehash)
 }
 
 func Example_parseArgs() {
@@ -32,17 +33,21 @@ func Example_parseArgs() {
 	checkArgs([]string{"progname", "-d", "xd", "--verbose", "-t"})
 	checkArgs([]string{"progname", "-t", "--dir", "."})
 	checkArgs([]string{"progname", "-t", "--dir", ".", "-s"})
+	checkArgs([]string{"progname", "-t", "--dir", ".", "-u", "-s"})
+	checkArgs([]string{"progname", "-t", "--dir", ".", "--usehash"})
 
 	// Output:
-	// 0 [] . false false
-	// 1 [true] . false false
-	// 2 [true true] . false false
-	// 1 [true] /somedir false false
-	// 0 [] /anotherdir false false
-	// 0 [] /anotherdir false true
-	// 1 [true] xd true false
-	// 0 [] . true false
-	// 0 [] . true true
+	// 0 [] . false false false
+	// 1 [true] . false false false
+	// 2 [true true] . false false false
+	// 1 [true] /somedir false false false
+	// 0 [] /anotherdir false false false
+	// 0 [] /anotherdir false true false
+	// 1 [true] xd true false false
+	// 0 [] . true false false
+	// 0 [] . true true false
+	// 0 [] . true true true
+	// 0 [] . true false true
 }
 func Example_printf() {
 	setPrintfPri(priCritcl)
