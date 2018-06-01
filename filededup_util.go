@@ -37,6 +37,7 @@ const (
 var requiredPri = priCritcl
 
 func parseArgs() {
+	parser.Usage += "[OPTIONS] \n\nVersion:\n  0.1"
 	if _, err := parser.Parse(); err != nil {
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
