@@ -2,6 +2,10 @@
 
 File deduplication utility. Find identical files and hard link them together.
 
+## Contributing
+
+If you look at this and see opportunities for improvement Feel free to let me know. If you find bugs, file an issue! If you have questions, feel free to email me or file an issue. I would generally be open to PRs as long as they improve the result in some way. Thanks!
+
 ## Motivation
 
 My present backup srategy uses `rsync` to
