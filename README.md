@@ -106,7 +106,8 @@ Punchlist:
 
 (Relative to a default Ubuntu 16.04 desktop install.)
 
-* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives)
+* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives) This is required for `go test`, not required to build and execute.
+* `go get github.com/HankB/filededup` will pull in dependencies. They can also be installed using the following two commands.
 * `go get github.com/mattn/go-sqlite3`
 * `go get github.com/jessevdk/go-flags`
 
