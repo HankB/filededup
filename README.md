@@ -110,14 +110,35 @@ Punchlist:
 
 (Relative to a default Ubuntu 16.04 desktop install.)
 
-* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives) This is required for `go test`, not required to build and execute.
+* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives) This is required for `go test`, not required to build and execute. (Deprecated)
+
+```text
+hbarta@olive:~/Programming/filededup$ go get github.com/HankB/filededup
+go: downloading github.com/HankB/filededup v0.0.0-20190609012401-e7d5d4777495
+go: downloading github.com/jessevdk/go-flags v1.5.0
+go: downloading golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4
+go get: installing executables with 'go get' in module mode is deprecated.
+	Use 'go install pkg@version' instead.
+	For more information, see https://golang.org/doc/go-get-install-deprecation
+	or run 'go help get' or 'go help install'.
+hbarta@olive:~/Programming/filededup$
+```
+
 * `go get github.com/HankB/filededup` will pull in dependencies. They can also be installed using the following two commands.
 * `go get github.com/mattn/go-sqlite3`
 * `go get github.com/jessevdk/go-flags`
+* Current Go version `go1.17.6` requires Additional commands to configure the project. The resulting files are committed to the repo and need not be repeated.
+
+```text
+go mod init filededup
+go mod tidy
+```
+
+* Build the executable using `go build .`.
 
 ### Operating system
 
-This has been developed and (minimally) tested on Ubuntu (16.04 LTS and 17.10) and Debian Stretch. In theory the `go` code should run on Microsoft Windows but the unit tests use Bourne shell scripts to set up the test environment. Windows would also require NTFS or other file system that supports hard links. This should work easily on Mac OS if the Bourne shell is installed and available.
+This has been developed and (minimally) tested on Ubuntu (16.04 LTS and 17.10), Debian Stretch and Debian Bullseye. In theory the `go` code should run on Microsoft Windows but the unit tests use Bourne shell scripts to set up the test environment. Windows would also require NTFS or other file system that supports hard links. This should work easily on Mac OS if the Bourne shell is installed and available.
 
 ## Database
 
