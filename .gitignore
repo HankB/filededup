@@ -17,3 +17,5 @@
 # databases
 *.db
 
+# program binary
+filededup
