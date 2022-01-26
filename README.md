@@ -114,10 +114,11 @@ Punchlist:
 
 (Relative to a default Ubuntu 16.04 desktop install.)
 
-* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives) This is required for `go test`, not required to build and execute. (Deprecated)
+* `sudo apt install sqlite3` (Debian, Ubuntu, derivatives) This is required for `go test`, not required to build and execute. 
+* `go get github.com/HankB/filededup` (Deprecated) will pull in dependencies. 
 
 ```text
-hbarta@olive:~/Programming/filededup$ go get github.com/HankB/filededup
+hbarta@olive:~/Programming/filededup$ go get github.com/HankB/filededup 
 go: downloading github.com/HankB/filededup v0.0.0-20190609012401-e7d5d4777495
 go: downloading github.com/jessevdk/go-flags v1.5.0
 go: downloading golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4
@@ -128,7 +129,7 @@ go get: installing executables with 'go get' in module mode is deprecated.
 hbarta@olive:~/Programming/filededup$
 ```
 
-* `go get github.com/HankB/filededup` will pull in dependencies. They can also be installed using the following two commands.
+They can also be installed using the following two commands. 
 * `go get github.com/mattn/go-sqlite3`
 * `go get github.com/jessevdk/go-flags`
 * Current Go version `go1.17.6` requires Additional commands to configure the project. The resulting files are committed to the repo and need not be repeated.
