@@ -2,6 +2,10 @@
 
 File deduplication utility. Find identical files and hard link them together.
 
+## Status
+
+Builds and tests OK with go1.17.6 on Debian Bullseye.
+
 ## Contributing
 
 If you look at this and see opportunities for improvement Feel free to let me know. If you find bugs, file an issue! If you have questions, feel free to email me or file an issue. I would generally be open to PRs as long as they improve the result in some way. Thanks!
