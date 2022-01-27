@@ -8,6 +8,14 @@ Builds and tests OK with go1.17.6 on Debian Bullseye.
 
 Work has begun on adding a persistent capacity: Save a copy of the database in order to resume following an abnormal exit.
 
+### Plan of work
+
+1. perform bulk testing as outlined in [testing/README.md](testing/README.md)
+1. Review the code, adding any commentary that seems needed considering the project has not been touched in 4 years.
+1. Review the logic for when a linked file is found in the database, considering that it can be there as a result of a previous run.
+1. Implement link counts added when file is replaced with a new new hard link. What happens if the existing file already has more than one link? The link will be broken. Perhaps counting broken links would be useful.
+1. Figure out what unit tests are appropriate for the new code.
+c
 ## Contributing
 
 If you look at this and see opportunities for improvement Feel free to let me know. If you find bugs, file an issue! If you have questions, feel free to email me or file an issue. I would generally be open to PRs as long as they improve the result in some way. Thanks!
