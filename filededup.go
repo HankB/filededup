@@ -44,11 +44,11 @@ func getHash(filename string) []byte {
 	return h.Sum(nil)
 }
 
+// TODO: file name from command line argument.
 //var dbName = "filelist.db"
 var dbName = ":memory:"
-var db *sql.DB
+var db *sql.DB		// DB handle
 var err error
-var hashes map[string][]byte
 
 /* Insert the file into the database
  */
@@ -131,8 +131,8 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 				min(blocksize, len-bytesRead), read2)
 		}
 
-		if bytes.Compare(buf1[0:read1], buf2[0:read2]) != 0 { // matching byes?
-			return false
+		if! bytes.Equal(buf1[0:read1], buf2[0:read2]) { // matching byes?
+				return false
 		}
 	}
 	return true
@@ -144,7 +144,8 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 */
 func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 	// search the database for files with matching length
-	rows, err := db.Query(`SELECT length, filename, hash linkCount
+	// TODO: seemingly spurious linkCount removed from query.
+	rows, err := db.Query(`SELECT length, filename, hash 
 							FROM files
 							WHERE length=?`,
 		info.Size())
@@ -182,7 +183,7 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 				if hashCandidate == nil {
 					hashCandidate = getHash(filepath)
 				}
-				if bytes.Compare(hashCandidate, possMatchHash) == 0 { // matching hash?
+				if bytes.Equal(hashCandidate, possMatchHash) { // matching hash?
 					if compareByteByByte(filepath, possMatchFilename, info.Size()) { // verify match
 						return true, possMatchFilename, possMatchHash
 					}
@@ -201,10 +202,8 @@ func findMatch(filepath string, info os.FileInfo) (bool, string, []byte) {
 
 	rows.Close()
 
-	if hashes != nil {
-		for key, value := range hashes {
-			updateHash(key, value)
-		}
+	for key, value := range hashes {
+		updateHash(key, value)
 	}
 
 	return false, "", hashCandidate
@@ -262,6 +261,8 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 			bytesSaved += uint64(info.Size())
 
 			if !options.Trial {
+				// TODO: check if 'path' has more than one link because
+				// if so, this operation will break a link.
 				replaceWithLink(matchPath, path)
 			}
 		} else {
@@ -273,6 +274,7 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 }
 
 /* init the database or go up in flames
+	TODO: implement logic for persistent database
  */
 func initDataBase(flavor, location string) {
 	if location != ":memory:" {
@@ -289,7 +291,7 @@ func initDataBase(flavor, location string) {
 	create table files (
 		length integer not null,
 		filename text not null,
-		hash blob defult null,
+		hash blob default null,
 		linkCount integer default 1);
 	`
 	// create the table
@@ -297,7 +299,6 @@ func initDataBase(flavor, location string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return
 }
 
 func closeDataBase() {
