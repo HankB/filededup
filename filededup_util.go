@@ -18,6 +18,7 @@ type Options struct {
 	Trial     bool   `short:"t" long:"trial" description:"report instead of performing operations"`
 	Summary   bool   `short:"s" long:"summary" description:"print summary of operations"`
 	Usehash   bool   `short:"u" long:"usehash" description:"Use hash to test match"`
+	Persist   string `short:"p" long:"persist" description:"save/reuse internal database" optional:"1" optional-value:"filededup.db"`
 }
 
 var options Options
@@ -37,7 +38,7 @@ const (
 var requiredPri = priCritcl
 
 func parseArgs() {
-	parser.Usage += "[OPTIONS] \n\nVersion:\n  0.1"
+	parser.Usage += "[OPTIONS] \n\nVersion:\n  0.2"
 	if _, err := parser.Parse(); err != nil {
 		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
 			os.Exit(0)
