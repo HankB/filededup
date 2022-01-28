@@ -44,10 +44,8 @@ func getHash(filename string) []byte {
 	return h.Sum(nil)
 }
 
-// TODO: file name from command line argument.
-//var dbName = "filelist.db"
-var dbName = ":memory:"
-var db *sql.DB		// DB handle
+var dbName string
+var db *sql.DB // DB handle
 var err error
 
 /* Insert the file into the database
@@ -131,8 +129,8 @@ func compareByteByByte(f1, f2 string, len int64) bool {
 				min(blocksize, len-bytesRead), read2)
 		}
 
-		if! bytes.Equal(buf1[0:read1], buf2[0:read2]) { // matching byes?
-				return false
+		if !bytes.Equal(buf1[0:read1], buf2[0:read2]) { // matching byes?
+			return false
 		}
 	}
 	return true
@@ -274,8 +272,7 @@ func myWalkFunc(path string, info os.FileInfo, err error) error {
 }
 
 /* init the database or go up in flames
-	TODO: implement logic for persistent database
- */
+*/
 func initDataBase(flavor, location string) {
 	if location != ":memory:" {
 		os.Remove(location) // remove previous copy
@@ -318,6 +315,11 @@ func main() {
 	bytesSaved = 0
 
 	parseArgs()
+	if options.Persist != "" {
+		dbName = options.Persist
+	} else {
+		dbName = ":memory:"
+	}
 	initDataBase("sqlite3", dbName)
 	defer closeDataBase()
 	filepath.Walk(options.Directory, myWalkFunc)
