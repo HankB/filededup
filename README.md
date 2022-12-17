@@ -4,7 +4,9 @@ File deduplication utility. Find identical files and hard link them together.
 
 ## Status
 
-Builds and tests OK with go1.17.6 on Debian Bullseye.
+~~Builds and tests OK with go1.17.6 on Debian Bullseye.~~
+
+No. It doesn't, at least not following the instructions below. I need to update the instructions or fix the project. I'm starting with the latter as I believe the directory structure is not fully correct. The next series of commits will fix this (and will test on more than one environment.)
 
 ## Contributing
 
